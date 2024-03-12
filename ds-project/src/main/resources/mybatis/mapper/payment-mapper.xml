@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+    
+<mapper namespace="payment">
+	
+	<select id="sequence" resultType="int">
+		select payment_seq.nextval from dual
+	</select>
+	
+	<insert id="save">
+		insert into payment(
+			payment_no, payment_tid, payment_name, 
+			reserve_no, payment_total, payment_remain, 
+			payment_time, member_id, method_type
+		)
+		values(
+			#{paymentNo}, #{paymentTid}, #{paymentName}, 
+			#{reserveNo}, #{paymentTotal}, #{paymentRemain}, 
+			#{paymentTime}, #{memberId}, #{methodType}
+		)
+	</insert>
+	
+	<!-- 결제내역 조회 기능(전체/회원별/...) -->
+	<select id="selectAll" resultType="PaymentDto">
+		select * payment order by payment_no desc
+	</select>
+	
+	<select id="selectByMember" resultType="PaymentDto">
+		select * from payment where member_id = #{memberId} order by payment_no desc
+	</select>
+	
+	<select id="find" resultType="PaymentDto">
+		select * from payment 
+		where payment_no = #{paymentNo} order by payment_no asc
+	</select>
+	
+	<update id="cancelRemain">
+		update payment set payment_remain = 0
+		where payment_no = #{paymentNo}
+	</update>
+	
+	<!-- 
+		결제 대표 정보(payment)와 상세 정보(payment_detail)를 같이 조회
+		- ResultMap을 사용한 계층형 조회
+		- 결제 대표 정보
+			- 결제 상세 정보
+			- 결제 상세 정보
+			- 결제 상세 정보
+			- 결제 상세 정보
+	-->
+	<!-- 잔여 금액 차감 -->
+	<update id="cancelRemainItem">
+		update payment
+		set payment_remain = payment_remain - #{itemTotal}
+		where payment_no = ${paymentNo}
+	</update>
+		
+	<!-- VO 조회 -->
+	<resultMap type="PaymentWithReserveVO" id="PaymentWithReserveResultMap">
+		<association property="paymentDto" javaType="PaymentDto">
+			<id column="payment_no" property="paymentNo"/>
+			<result column="payment_tid" property="paymentTid"/>
+			<result column="payment_name" property="paymentName"/>
+			<result column="reserve_no" property="reserveNo"/>
+			<result column="payment_total" property="paymentTotal"/>
+			<result column="payment_remain" property="paymentRemain"/>
+			<result column="payment_time" property="paymentTime"/>
+			<result column="member_id" property="memberId"/>
+			<result column="method_type" property="methodType"/>
+		</association>
+		<association property="reserveDto" javaType="ReserveDto">
+    		<id column="reserve_no" property="reserveNo"/>
+			<result column="member_id" property="memberId"/>
+			<result column="ground_no" property="groundNo"/>
+			<result column="reserve_date" property="reserveDate"/>
+			<result column="schedule_no" property="scheduleNo"/>
+			<result column="reserve_status" property="reserveStatus"/>
+		</association>
+	</resultMap>
+		
+	<!-- 예약 정보 조회 -->
+	<select id="reserveInfo" resultMap="PaymentWithReserveResultMap">
+		SELECT p.*, r.*
+		FROM payment p
+		JOIN reserve r ON p.reserve_no = r.reserve_no
+		WHERE p.member_id = #{memberId}
+	</select>
+		
+</mapper>
