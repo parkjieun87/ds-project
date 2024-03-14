@@ -117,11 +117,11 @@
                 <span>팀 게시판</span>
               </a>
             </li>
-            <li class="nav-item">
-              <a class="nav-link fs-5" href="/free/list">
-                <span>용병 게시판</span>
-              </a>
-            </li>
+<!--             <li class="nav-item"> -->
+<!--               <a class="nav-link fs-5" href="/free/list"> -->
+<!--                 <span>용병 게시판</span> -->
+<!--               </a> -->
+<!--             </li> -->
             </ul>
          </div>
          <!-- 검색창 -->

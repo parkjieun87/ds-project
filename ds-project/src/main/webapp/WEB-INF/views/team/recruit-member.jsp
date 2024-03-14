@@ -569,6 +569,7 @@ input {
 								class="fa-solid fa-arrow-down filter--arrow"></i></li>
 						</ul>
 					</div>
+					<a href="/team/insert" class="btn btn-primary mt-2 float-end">팀 생성</a> <i></i>
 				</div>
 			<div id="list">
 				<div class="team-main-list__wrapper">
