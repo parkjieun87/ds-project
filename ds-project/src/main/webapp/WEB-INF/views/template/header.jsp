@@ -133,7 +133,7 @@
          <div class="d-flex align-items-center">
                 <a
                   class="btn btn-dark px-3 me-2 btn-rounded"
-                  href="${pageContext.request.contextPath}/member/login"
+                  href="${pageContext.request.contextPath}/member/login" 
                   role="button"
                   >
                   <i class="fas fa-user me-2"></i>
