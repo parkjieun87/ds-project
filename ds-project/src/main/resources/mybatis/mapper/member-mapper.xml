@@ -16,9 +16,14 @@
     -->
     
     <!-- 로그인 -->
+<!--     <select id="memberLogin" parameterType="String" resultType="MemberDto">
+       select * from member where member_id=#{memberId} 
+    </select> -->
+    <!-- 2024.03.18 수 -->
     <select id="memberLogin" parameterType="String" resultType="MemberDto">
-       select * from member where member_id=#{memberId}
-    </select>
+ 	   select * from member where member_id=#{memberId, jdbcType=VARCHAR}
+	</select>
+    
     
     <!-- 회원가입 -->
     <insert id="memberJoin">

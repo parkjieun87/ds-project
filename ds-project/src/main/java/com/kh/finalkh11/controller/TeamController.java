@@ -166,30 +166,68 @@ public class TeamController {
     	return "team/myTeamFail";
     }
     
+//    @GetMapping("/detail/{teamNo}")
+//    public String showTeamDetail(
+//    		@PathVariable("teamNo") int teamNo,
+//    		HttpSession session,
+//    		Model model) {
+//    	String memberId = (String) session.getAttribute(SessionConstant.memberId);
+//    	MemberDto memberDto = memberRepo.selectOne(memberId);
+//    	
+//        TeamDto teamDto = teamService.getTeamByNo(teamNo);
+//        int count = teamMemberRepo.selectTeamMemberCount(teamNo);
+//        if (teamDto != null) {
+//            // 팀 리더의 이름 설정
+//            String teamLeaderName = memberService.getMemberNameById(teamDto.getTeamLeader());
+//            teamDto.setTeamLeaderName(teamLeaderName);
+//            
+//            model.addAttribute("memberDto", memberDto);
+//            model.addAttribute("teamDto", teamDto);
+//            model.addAttribute("count", count);
+//            
+//            return "team/detail";
+//        }
+//        else {
+//            // handle error
+//            return "redirect:/member/login";
+//        }
+//    }
+    
+    //2024.03.18 로그인 안한 user는 팀게시판의 detail 글에 접근하지 못하게 
     @GetMapping("/detail/{teamNo}")
     public String showTeamDetail(
-    		@PathVariable("teamNo") int teamNo,
-    		HttpSession session,
-    		Model model) {
-    	String memberId = (String) session.getAttribute(SessionConstant.memberId);
-    	MemberDto memberDto = memberRepo.selectOne(memberId);
-    	
-        TeamDto teamDto = teamService.getTeamByNo(teamNo);
-        int count = teamMemberRepo.selectTeamMemberCount(teamNo);
-        if (teamDto != null) {
-            // 팀 리더의 이름 설정
-            String teamLeaderName = memberService.getMemberNameById(teamDto.getTeamLeader());
-            teamDto.setTeamLeaderName(teamLeaderName);
-            
-            model.addAttribute("memberDto", memberDto);
-            model.addAttribute("teamDto", teamDto);
-            model.addAttribute("count", count);
-            
-            return "team/detail";
-        }
-        else {
-            // handle error
+        @PathVariable("teamNo") int teamNo,
+        HttpSession session,
+        Model model) {
+        // 세션에서 회원 ID 가져오기
+        String memberId = (String) session.getAttribute(SessionConstant.memberId);
+
+        // 로그인 되어 있는지 확인
+        if (memberId == null) {
+            // 로그인 되어 있지 않은 경우 로그인 페이지로 리다이렉트
             return "redirect:/member/login";
+        } else {
+            // 로그인된 회원의 정보 조회
+            MemberDto memberDto = memberRepo.selectOne(memberId);
+            
+            // 팀 상세 정보 조회
+            TeamDto teamDto = teamService.getTeamByNo(teamNo);
+            int count = teamMemberRepo.selectTeamMemberCount(teamNo);
+            
+            if (teamDto != null) {
+                // 팀 리더의 이름 설정
+                String teamLeaderName = memberService.getMemberNameById(teamDto.getTeamLeader());
+                teamDto.setTeamLeaderName(teamLeaderName);
+                
+                model.addAttribute("memberDto", memberDto);
+                model.addAttribute("teamDto", teamDto);
+                model.addAttribute("count", count);
+                
+                return "team/detail";
+            } else {
+                // 팀 정보가 없는 경우 예외 처리
+                return "redirect:/error";
+            }
         }
     }
     
